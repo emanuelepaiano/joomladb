@@ -1,0 +1,247 @@
+You can see updated online documentation on http://joomladb.sourceforge.net/
+
+
+JoomlaDB v0.1 Features
+
+    * Generate html links to internal Joomla articles
+    * Generate <ul> tags with articles from a category
+    * Generate <ul> tags with articles from a section
+    * Respect article page theme assigned from Joomla
+    * Powerful to create custom html menu
+    * Opensource freedom: released under GNU License
+
+
+LICENSE: GPL2
+
+Libs to interface web applications with Joomla database and generate links.
+Copyright (C) 2011  Emanuele Paiano <nixw0rm@gmail.com>
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+
+AUTHOR
+If you want to help me or you need some informations write to 
+Emanuele Paiano <nixw0rm@gmail.com>
+
+
+DOCS
+
+    * Quick start
+          o Import JoomlaDB into your PHP source
+          o Creating simple link to article
+          o Creating simple link to article with <a> tags (full <a> code)
+          o Creating simple link to article without <a> tags (only href path)
+          o Creating <ul> list articles from a section
+    * Advanced using guide: Classes and Methods
+          o Class JoomlaDB
+          o Class Article
+          o Class Section
+          o Class Category
+
+ 
+
+0) QUICK START
+
+Let's suppose that you want to create a php source file named test.php. This file generate an output html containing links to Joomla articles.
+
+1) Import JoomlaDB into your PHP source
+
+Before using JoomlaDB methods you should import joomladb.php file into your code typing:
+
+<?php  
+      import "joomladb.php"; 
+
+      import "custom.php";
+?>
+
+And you can call methods and functions from libs. I think you should declare php database parametres to use later when you try access to mysql (set your correct parametres):
+
+<?
+ $hostname="mysql_host"; 
+ $user="mysql_user";
+ $password="mysql_password";
+ $database="Joomla_database_name";
+?>
+
+Now you can use for every object these parametres:
+
+$object->setDB($hostname, $user, $password, $database);
+
+2) Creating simple link to article
+
+Using Article Class you can instance articles like objects and execute some operation on them. First, create an empty object articles:
+
+$article=new Article();
+
+Next initialize mysql access:
+
+$article->setDB($hostname, $user, $password, $database);
+
+To generate link you must assign an article then use:
+
+$article->set_atitle("title article");
+
+Now you can create full links (2.1) or href link (2.2).
+
+2.1) Creating simple link to article with <a> tags (full <a> code)
+
+After initializated article object, you can create full <a></a> code with:
+
+$link=$article->art_link();
+
+and print into your html code:
+
+<? echo $link; ?>
+
+Into html output you can see link like this:
+
+<a href="index.php?option=com_content&view=article&id=1 
+&Itemid=0">title article</a>
+
+If you are too lazy, you can use custom function for this work:
+
+
+function linkart($title,$dbhost, $dbuser, $dbpass, $dbname)
+{
+ $temp=new Article();
+ $temp->setDB($dbhost, $dbuser, $dbpass, $dbname);
+ $temp->set_atitle($title);
+ echo $temp->art_link();
+}
+
+So while you are writing html code you can type simply:
+
+<h1><? linkart("title archive",$hostname, $user, $password, $database); ?></h1>
+
+2.2) Creating simple link to article without <a> tags (only href path)
+
+If you want to customize html code into <a></a> tag, replace art_link() method with art_ref(). Remember that you must write <a> and </a> code:
+
+$link="<a href='" . $article->art_href() . "'>Custom Text Article </a>";
+
+Into html code type:
+
+<h1><? echo $link; ?></h1>
+
+Output is similar this:
+
+<h1><a href="index.php?option=com_content&view=article&id=1 &Itemid=0">Custom Text Article</a></h1>
+
+If you are too lazy, you can use custom function for this work:
+
+function hrefart($title,$dbhost, $dbuser, $dbpass, $dbname)
+{
+ $temp=new Article();
+ $temp->setDB($dbhost, $dbuser, $dbpass, $dbname);
+ $temp->set_atitle($title);
+ echo $temp->art_href();
+}
+
+Now you can type:
+
+$link="<a _href='". hrefart("title article", $hostname, $user, $password,
+ $database) . "'>Custom Text Article </a>";
+
+without initialization described in step (2).
+
+3) Creating <ul> list articles from a section
+
+In this case we need to use another class: Section. Because it's too complex for quick use, we use directly custom function:
+
+
+function ulsect($section,$dbhost, $dbuser, $dbpass, $dbname){ ... }
+
+Now we can insert into our php code:
+
+
+$ul=ulsect("SECTION NAME",$hostname, $user, $password, $database);
+echo $ul;
+
+Html output is similar this:
+
+<ul>
+  <li><a _href="index.php? .....">Article1</a></li>
+  <li><a _href="index.php? .....">Article2</a></li>
+  .... 
+</ul>
+
+4) Advanced using guide: Classes and Methods
+
+JoomlaDB is a set of classes and methods that you can permits to extract information from joomladb useful to generate links, category... Next step we explain classes and methods implemented into joomladb lib.
+
+5) JoomlaDB class
+
+This class (Main Class) can instance object Joomla: contains important information about joomla database like hostname, username, password, driver database (default is mysql) and Joomla's database name. Other class are extended from this class.
+
+Methods:
+
+    * setDB($dbhost, $dbuser, $dbpass, $dbname): used to save mysql parametres. Parametres are:
+          o $dbhost: database hostname (usually is localhost);
+          o $dbuser: database user (example: root);
+          o $dbpassword: password of user to access to database;
+          o $dbname: database used by Joomla 1.5;
+    * set_name($value): change $dbname described top;
+    * set_driver($value): change driver used (default is  mysql). Compatibles types are same adodb4;
+    * set_user($value): change $dbuser internal variable used to access to database;
+    * set_pass($value): change $dbpass internal variable used to access to database;
+    * set_host($value): change $dbhost internal variable used to access to database;
+    * get_host(): return value of $dbhost;
+    * get_user(): return value of $dbuser;
+    * get_pass(): return value of $dbpass;
+    * get_name(): return value of $dbname;
+    * get_driver(): return driver used for database (default mysql).
+
+6) Class Article
+
+This class is extended from JoomlaDB, so has previous described methods and other to manage title, link, id, category, etc... Index variable is $atitle. Additional methods are:
+
+    * set_atitle($value): set joomla article title. This method doesn't change joomla title archive, but only internal $atitle variable used like pointer to extract article from database.
+    * get_atitle(): return $title variable value. return text of articles.
+    * set_aid($value): like set atitle, set id of joomla article created. variable: $aid
+    * get_aid($value): return $aid value, id of current articles.
+    * art_update(): used to read article again from joomla database for object refresh. Often used after methods that starts with 'set' (set_aid, set_atitle,...)
+    * get_section(): return section id of article. Use after art_update() method.
+    * get_text(): return full text of article. Use after art_update() method.
+    * art_link($params=FALSE): use this method to generate full link. If you want to customize <a> tag pass parametres like target='blank'.
+    * art_href(): doesn't return full link. Only href path.
+
+7) Class Section
+
+This class is extended from JoomlaDB, so has previous described methods and other to extract category or articles from a section. Index variable is $sname. Additional methods are:
+
+    * set_sname($value):  Used to set $sname variable (index). sname is section name presents into Joomla database.
+    * get_sname(): Return $sname value.
+    * set_sid($value) : set $sid variable. $sid is Section ID.
+    * update_section(): used to read section again from joomla database for object refresh. Often used after methods that starts with 'set' (set_sid, set_sname,...)
+    * fetch_categories(): set or update $categories array. This array contain all categories in current section. use next method to get $categories value.
+    * get_categories(): return array value of $categories.
+    * fetch_articles(): set or update $Sarticles array. This array contain all articles in current section. use next method to get $Sarticles value.
+    * get_Sarticles(): return $Sarticles array value.
+    * ul_gen_Sarticles($params,$link=false, $class_link=false): generate <ul> tags with internal articles in current section. $param is used to generate <ul $params > like output so you can customize <ul> tags if $class_link=false default id is UL_JOOMLADB.
+    * ul_gen_categories($params,$link=false, $class_link=false): like previous but contains categories into current section.
+
+8) Class Category
+
+This class is extended from JoomlaDB, so has previous described methods and other to extract category or articles from a section. Index variable is $cname. Additional methods are:
+
+    * set_cname($value): Used to set $sname variable (index). cname is category name presents into Joomla database.
+    * get_cname(): return $cname variable value.
+    * set_sid($value):  set $cid variable. $cid is Category ID.
+    * update_category(): used to read category again from joomla database for object refresh. Often used after methods that starts with 'set' (set_cid, set_cname,...)
+    * fetch_Carticles(): set or update $Carticles array. This array contain all articles in current category. use next method to get $Carticles value.
+    * get_Carticles(): return array value of $Carticles array.
+    * ul_gen_Carticles($params,$link=false, $class_link=false): generate <ul> tags with internal articles in current category. $param is used to generate <ul $params > like output so you can customize <ul> tags if $class_link=false default id is UL_JOOMLADB.
+
+
